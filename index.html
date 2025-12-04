@@ -428,9 +428,7 @@
 
             <!-- 動画背景 -->
 
-            <video class="video-background" autoplay loop muted playsinline preload="metadata">
-
-                <source src="images/hero/hero-video.mp4" type="video/mp4">
+            <video id="hero-video" class="video-background" autoplay loop muted playsinline preload="auto">
 
             </video>
 
@@ -1160,19 +1158,19 @@
 
     <!-- スマホ用 スティッキーCTA -->
 
-    <div id="sticky-cta" class="fixed bottom-0 left-0 w-full z-50 p-4 sm:hidden flex gap-3 bg-black/90 backdrop-blur border-t-2 border-accent">
+    <div id="sticky-cta" class="fixed bottom-0 left-0 w-full z-50 p-3 sm:hidden flex gap-2 bg-black/90 backdrop-blur border-t-2 border-accent">
 
-        <a href="#contact" class="flex-1 bg-black border border-white/20 text-white font-bold py-3 text-center text-sm flex items-center justify-center gap-2">
+        <a href="#contact" class="flex-1 bg-black border border-white/20 text-white font-bold py-2.5 text-center text-xs flex items-center justify-center gap-1">
 
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
 
             問合せ
 
         </a>
 
-        <a href="#contact" class="flex-[2] bg-accent text-black font-black py-3 text-center text-lg shadow-[0_0_15px_rgba(255,102,0,0.5)] animate-pulse">
+        <a href="#contact" class="flex-1 bg-white/10 border border-white/20 text-white font-bold py-2.5 text-center text-xs anton-font tracking-wide">
 
-            体験予約 ¥500
+            FREE TRIAL LESSON
 
         </a>
 
@@ -1185,6 +1183,64 @@
     <script>
 
         document.addEventListener('DOMContentLoaded', () => {
+
+            // 0. 動画の最適化読み込み（デバイスに応じて動画を切り替え）
+
+            const heroVideo = document.getElementById('hero-video');
+
+            if (heroVideo) {
+
+                const isMobile = window.innerWidth <= 768;
+
+                // モバイルではpreloadをmetadataに設定（読み込みを軽量化）
+
+                heroVideo.preload = isMobile ? 'metadata' : 'auto';
+
+                const videoSource = document.createElement('source');
+
+                videoSource.src = isMobile 
+
+                    ? 'images/hero/hero-video-mobile.mp4'  // モバイル用（6.2MB）
+
+                    : 'images/hero/hero-video.mp4';         // デスクトップ用（34MB・高画質）
+
+                videoSource.type = 'video/mp4';
+
+                heroVideo.appendChild(videoSource);
+
+                // リサイズ時に動画を再読み込み
+
+                let resizeTimer;
+
+                window.addEventListener('resize', () => {
+
+                    clearTimeout(resizeTimer);
+
+                    resizeTimer = setTimeout(() => {
+
+                        const newIsMobile = window.innerWidth <= 768;
+
+                        const currentSrc = videoSource.src.includes('mobile');
+
+                        if ((newIsMobile && !currentSrc) || (!newIsMobile && currentSrc)) {
+
+                            heroVideo.preload = newIsMobile ? 'metadata' : 'auto';
+
+                            videoSource.src = newIsMobile 
+
+                                ? 'images/hero/hero-video-mobile.mp4'
+
+                                : 'images/hero/hero-video.mp4';
+
+                            heroVideo.load();
+
+                        }
+
+                    }, 250);
+
+                });
+
+            }
 
             // 1. スクロールアニメーション (フェードイン)
 
