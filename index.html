@@ -430,6 +430,8 @@
 
             <video id="hero-video" class="video-background" autoplay loop muted playsinline preload="auto">
 
+                <source src="images/hero/hero_movie.mp4" type="video/mp4">
+
             </video>
 
             <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/50 to-black/30 z-10"></div>
@@ -1192,7 +1194,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
 
-            // 0. 動画の読み込み
+            // 0. 動画の読み込み最適化
 
             const heroVideo = document.getElementById('hero-video');
 
@@ -1204,36 +1206,19 @@
 
                 heroVideo.preload = isMobile ? 'metadata' : 'auto';
 
-                const videoSource = document.createElement('source');
+                // 動画の読み込みエラーをハンドリング
 
-                videoSource.src = 'images/hero/hero_movie.mp4';  // ヒーロー動画（36MB）
+                heroVideo.addEventListener('error', (e) => {
 
-                videoSource.type = 'video/mp4';
+                    console.error('動画の読み込みエラー:', e);
 
-                heroVideo.appendChild(videoSource);
+                });
 
-                // リサイズ時に動画を再読み込み
+                // 動画の読み込み成功を確認
 
-                let resizeTimer;
+                heroVideo.addEventListener('loadeddata', () => {
 
-                window.addEventListener('resize', () => {
-
-                    clearTimeout(resizeTimer);
-
-                    resizeTimer = setTimeout(() => {
-
-                        // hero_movie.mp4を統一して使用
-                        if (!videoSource.src.includes('hero_movie.mp4')) {
-
-                            heroVideo.preload = window.innerWidth <= 768 ? 'metadata' : 'auto';
-
-                            videoSource.src = 'images/hero/hero_movie.mp4';
-
-                            heroVideo.load();
-
-                        }
-
-                    }, 250);
+                    console.log('動画の読み込み成功');
 
                 });
 
