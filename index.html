@@ -428,9 +428,11 @@
 
             <!-- 動画背景 -->
 
-            <video id="hero-video" class="video-background" autoplay loop muted playsinline preload="auto">
+            <video id="hero-video" class="video-background" autoplay loop muted playsinline preload="auto" webkit-playsinline="true" x-webkit-airplay="allow">
 
-                <source src="images/hero/hero_movie.mp4" type="video/mp4">
+                <source src="/images/hero/hero_movie.mp4" type="video/mp4">
+
+                お使いのブラウザは動画をサポートしていません。
 
             </video>
 
@@ -1210,17 +1212,59 @@
 
                 heroVideo.addEventListener('error', (e) => {
 
-                    console.error('動画の読み込みエラー:', e);
+                    console.error('動画の読み込みエラー:', e, heroVideo.error);
+
+                    // フォールバック: 相対パスを試す
+
+                    const source = heroVideo.querySelector('source');
+
+                    if (source) {
+
+                        if (source.src.startsWith('/')) {
+
+                            source.src = source.src.substring(1);
+
+                        } else {
+
+                            source.src = '/images/hero/hero_movie.mp4';
+
+                        }
+
+                        heroVideo.load();
+
+                    }
 
                 });
 
                 // 動画の読み込み成功を確認
 
-                heroVideo.addEventListener('loadeddata', () => {
+                heroVideo.addEventListener('canplay', () => {
 
-                    console.log('動画の読み込み成功');
+                    console.log('動画の読み込み成功 - 再生可能');
+
+                    // 動画の再生を試みる
+
+                    heroVideo.play().catch(err => {
+
+                        console.error('動画の再生エラー:', err);
+
+                    });
 
                 });
+
+                heroVideo.addEventListener('loadedmetadata', () => {
+
+                    console.log('動画のメタデータ読み込み完了');
+
+                });
+
+                // 動画の読み込みを明示的に開始
+
+                setTimeout(() => {
+
+                    heroVideo.load();
+
+                }, 100);
 
             }
 
